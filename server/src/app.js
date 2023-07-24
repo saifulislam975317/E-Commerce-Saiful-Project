@@ -5,6 +5,8 @@ var bodyParser = require("body-parser");
 const createError = require("http-errors");
 const xssClean = require("xss-clean");
 const rateLimit = require("express-rate-limit");
+const userRouter = require("./routers/userRouter");
+const seedRouter = require("./routers/seedRouter");
 
 const limiter = rateLimit({
   windowMs: 1 * 60 * 1000, // 1 minute
@@ -20,6 +22,7 @@ const isLoggedIn = (req, res, next) => {
     return res.status(401).json({ message: "please login first" });
   }
 };
+
 // middleware
 app.use(isLoggedIn);
 app.use(limiter);
@@ -40,11 +43,9 @@ app.get("/products", (req, res) => {
   });
 });
 
-app.get("/products/api", (req, res) => {
-  res.status(200).send({
-    message: "user profile api",
-  });
-});
+app.use("/api/users", userRouter);
+
+app.use("/api/seed", seedRouter);
 
 // client error handling
 app.use((req, res, next) => {
